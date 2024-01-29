@@ -5,7 +5,8 @@
 
 ```bash
 npm install
-npm start
+npm run build
+npx node ./dist/main.js
 ```
 
 - The generated types should be in `output.d.ts`
