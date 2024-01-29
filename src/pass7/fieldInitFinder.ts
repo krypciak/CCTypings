@@ -1,24 +1,24 @@
-import { Finder } from '../pass';
-import { Namespace, Class, FunctionMeta, FieldMeta } from '../type';
-import * as estree from 'estree';
+import { Finder } from '../pass'
+import { Namespace, Class, FunctionMeta, FieldMeta } from '../type'
+import * as estree from 'estree'
 
 export class FieldInitFinder extends Finder {
     public find(_: estree.Program, context: Namespace): void {
-        this.findClasses(context);
+        this.findClasses(context)
     }
 
     private findClasses(namespace: Namespace): void {
         for (const ns of namespace.namespaces) {
-            this.findClasses(ns);
+            this.findClasses(ns)
         }
         for (const clazz of namespace.classes) {
-            this.findFields(clazz);
+            this.findFields(clazz)
         }
     }
 
     private findFields(clazz: Class): void {
         for (const field of clazz.fields) {
-            this.findFieldType(field);
+            this.findFieldType(field)
         }
     }
 
@@ -29,22 +29,22 @@ export class FieldInitFinder extends Finder {
                     case 'boolean':
                     case 'number':
                     case 'string':
-                        field.type = typeof field.initSrc.value;
-                        break;
+                        field.type = typeof field.initSrc.value
+                        break
                 }
-                break;
+                break
             case 'NewExpression':
                 try {
-                    const name = this.getName(field.initSrc);
+                    const name = this.getName(field.initSrc)
                     if (name.length !== 1) {
-                        field.type = name;
+                        field.type = name
                     }
                 } catch (ex) {
                     if (ex !== 'Computed') {
-                        throw ex;
+                        throw ex
                     }
                 }
-                break;
+                break
             case 'Identifier':
             case 'ArrayExpression':
             case 'ObjectExpression':
@@ -52,25 +52,25 @@ export class FieldInitFinder extends Finder {
             case 'MemberExpression':
             case 'UnaryExpression':
             case 'BinaryExpression':
-                break;
+                break
             default:
-                debugger;
+                debugger
         }
     }
     private getName(node: estree.Node): string {
-        switch(node.type) {
-            case "NewExpression":
-                return this.getName(node.callee);
-            case "Identifier":
-                return node.name;
-            case "MemberExpression":
+        switch (node.type) {
+            case 'NewExpression':
+                return this.getName(node.callee)
+            case 'Identifier':
+                return node.name
+            case 'MemberExpression':
                 if (node.computed && node.object.type !== 'Literal') {
-                    throw 'Computed';
+                    throw 'Computed'
                 }
-                return this.getName(node.object) + '.' + this.getName(node.property);
+                return this.getName(node.object) + '.' + this.getName(node.property)
             default:
-                debugger;
-                return '';
+                debugger
+                return ''
         }
     }
 }
